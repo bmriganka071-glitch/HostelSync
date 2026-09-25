@@ -1,1 +1,9 @@
-# HostelSync
+# Hostel Sync  - a database based application for digitizing the hostel experience in educational institutions .
+1. Problem Statement and Motivation
+   
+2.  Hostel administration in most institutes is still handled through a mix of registers, WhatsApp groups and Excel sheets. Room allotment is noted down manually, mess bills are calculated by hand at the end of every month, and something as simple as two students wanting to swap rooms turns into a chain of verbal requests to the warden that nobody keeps a proper record of.
+3.   We spoke informally with a few boarders and a hostel warden in our own institute to understand the pain points, and three problems came up repeatedly:
+4.    ● Room swaps between students are informal and undocumented, which causes disputes later about who is actually allotted which room.  ● Mess bill calculation, especially rebates for days a student is away, is done manually every month and is error-prone.
+5. ● Notices and hostel events are circulated through group chats where important updates get buried within a day.  HostelSync is our attempt to put these three workflows into one database-backed system so that room allocation, mess billing and hostel communication all sit on a single, consistent source of truth rather than scattered registers and chat threads.  2. Stakeholders and Intended Users  We identified two primary user roles based on how the hostel actually functions:
+6.  ● Boarder (student resident) - applies for room swaps, checks mess bills and rebate status, and views notices/events.
+7.  ● Admin / Warden - approves or rejects swap requests, manages room and block data, generates mess bills, tracks fine defaulters, and publishes notices/events.  Both roles log into the same application; what changes is what actions are permitted, which is enforced through a role field on the user rather than separate applications.  
