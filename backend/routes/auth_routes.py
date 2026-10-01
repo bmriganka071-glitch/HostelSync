@@ -1,3 +1,4 @@
+from auth_utils import create_token
 from flask import Blueprint, request, jsonify
 from werkzeug.security import check_password_hash
 
@@ -23,14 +24,17 @@ def login():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute(
-        """
-        SELECT id, name, email, password_hash, role, room_id
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            email,
+            password_hash,
+            role,
+            room_id
         FROM users
         WHERE email = %s
-        """,
-        (email,)
-    )
+    """, (email,))
 
     user = cursor.fetchone()
 
@@ -47,13 +51,19 @@ def login():
             "message": "Invalid email or password"
         }), 401
 
+    token = create_token(
+    user["id"],
+    user["role"]
+)
+
     return jsonify({
-        "message": "Login successful",
-        "user": {
-            "id": user["id"],
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"],
-            "room_id": user["room_id"]
-        }
+    "message": "Login successful",
+    "token": token,
+    "user": {
+        "id": user["id"],
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"],
+        "room_id": user["room_id"]
+    }
     }), 200

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from db import get_db_connection
+from auth_utils import admin_required
 
 
 admin_routes = Blueprint("admin_routes", __name__)
@@ -8,6 +9,7 @@ admin_routes = Blueprint("admin_routes", __name__)
 
 # Get all boarders
 @admin_routes.route("/api/admin/boarders", methods=["GET"])
+@admin_required
 def get_boarders():
 
     db = get_db_connection()
@@ -44,6 +46,7 @@ def get_boarders():
     "/api/admin/boarders/<int:boarder_id>/room",
     methods=["PUT"]
 )
+@admin_required
 def allocate_room(boarder_id):
 
     data = request.get_json()
