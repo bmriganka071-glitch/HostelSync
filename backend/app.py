@@ -9,6 +9,8 @@ from routes.room_swap_routes import room_swap_routes
 from routes.mess_rebate_routes import mess_rebate_routes
 from routes.mess_bill_routes import mess_bill_routes
 from routes.payment_routes import payment_routes
+from routes.notice_routes import notice_routes
+from routes.event_routes import event_routes
 
 from flask import Flask
 
@@ -21,6 +23,8 @@ app.register_blueprint(room_swap_routes)
 app.register_blueprint(mess_rebate_routes)
 app.register_blueprint(mess_bill_routes)
 app.register_blueprint(payment_routes)
+app.register_blueprint(notice_routes)
+app.register_blueprint(event_routes)
 
 
 
