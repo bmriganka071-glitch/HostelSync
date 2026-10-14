@@ -95,7 +95,7 @@ CREATE TABLE users (
 
     password_hash VARCHAR(255) NOT NULL,
 
-    role ENUM('ADMIN', 'BOARDER') NOT NULL,
+    role ENUM('ADMIN', 'BOARDER') NOT NULL DEFAULT 'BOARDER',
 
     room_id INT NULL,
 

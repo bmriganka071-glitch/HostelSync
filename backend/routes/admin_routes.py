@@ -7,6 +7,38 @@ from auth_utils import admin_required
 admin_routes = Blueprint("admin_routes", __name__)
 
 
+@admin_routes.route("/api/admin/users/<int:user_id>/role", methods=["PUT"])
+@admin_required
+def promote_boarder_to_admin(user_id):
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or data.get("role") != "ADMIN":
+        return jsonify({"message": "Only promotion to ADMIN is supported"}), 400
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT id, name, email, role FROM users WHERE id = %s", (user_id,))
+        boarder = cursor.fetchone()
+        if not boarder:
+            return jsonify({"message": "Boarder not found"}), 404
+        if boarder["role"] != "BOARDER":
+            return jsonify({"message": "This user is not a boarder"}), 409
+
+        cursor.execute("UPDATE users SET role = 'ADMIN' WHERE id = %s AND role = 'BOARDER'", (user_id,))
+        if cursor.rowcount != 1:
+            db.rollback()
+            return jsonify({"message": "The boarder role changed. Refresh and try again"}), 409
+        db.commit()
+        return jsonify({
+            "message": "Administrator access granted",
+            "user": {"id": boarder["id"], "name": boarder["name"], "email": boarder["email"], "role": "ADMIN"}
+        }), 200
+    finally:
+        cursor.close()
+        db.close()
+
+
 # Get all boarders
 @admin_routes.route("/api/admin/boarders", methods=["GET"])
 @admin_required

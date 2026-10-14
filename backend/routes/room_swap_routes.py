@@ -451,3 +451,97 @@ def admin_respond_to_swap(swap_id):
 
         cursor.close()
         db.close()
+
+    # ---------------------------------------------------------
+# Boarder: Get my swap requests
+# ---------------------------------------------------------
+@room_swap_routes.route("/api/room-swaps", methods=["GET"])
+def get_my_swaps():
+    token_data, error_response, error_status = get_token_data()
+
+    if error_response:
+        return error_response, error_status
+
+    user_id = token_data["user_id"]
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT
+                rs.id,
+                rs.sender_id,
+                sender.name AS sender,
+                rs.receiver_id,
+                receiver.name AS receiver,
+                rs.status,
+                rs.created_at
+            FROM room_swap_requests rs
+            JOIN users sender
+                ON rs.sender_id = sender.id
+            JOIN users receiver
+                ON rs.receiver_id = receiver.id
+            WHERE rs.sender_id = %s OR rs.receiver_id = %s
+            ORDER BY rs.created_at DESC
+        """, (user_id, user_id))
+
+        swaps = cursor.fetchall()
+        return jsonify(swaps), 200
+
+    except Exception:
+        return jsonify({
+            "message": "Failed to fetch room swaps"
+        }), 500
+
+    finally:
+        cursor.close()
+        db.close()
+
+
+# ---------------------------------------------------------
+# Admin: Get all swap requests
+# ---------------------------------------------------------
+@room_swap_routes.route("/api/admin/room-swaps", methods=["GET"])
+def get_admin_swaps():
+    token_data, error_response, error_status = get_token_data()
+
+    if error_response:
+        return error_response, error_status
+
+    if token_data["role"] != "ADMIN":
+        return jsonify({
+            "message": "Admin access required"
+        }), 403
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT
+                rs.id,
+                sender.name AS sender,
+                receiver.name AS receiver,
+                rs.status,
+                rs.created_at,
+                rs.updated_at
+            FROM room_swap_requests rs
+            JOIN users sender
+                ON rs.sender_id = sender.id
+            JOIN users receiver
+                ON rs.receiver_id = receiver.id
+            ORDER BY rs.created_at DESC
+        """)
+
+        swaps = cursor.fetchall()
+        return jsonify(swaps), 200
+
+    except Exception:
+        return jsonify({
+            "message": "Failed to fetch room swaps"
+        }), 500
+
+    finally:
+        cursor.close()
+        db.close()        
